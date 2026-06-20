@@ -18,15 +18,17 @@ st.set_page_config(
 
 st.title("🐾 Поиск животных в картотеках потерянных животных")
 
-st.write("""
-Проект демонстрирует сервис поиска похожих животных по фотографии.
+st.write(
+    '''
+    Проект демонстрирует сервис поиска похожих животных по фотографии.
 
-Архитектура:
-- Frontend: Streamlit
-- Backend: FastAPI
-- База данных: SQLite
-- ML-модель: ResNet18
-""")
+    Архитектура:
+    - Frontend: Streamlit
+    - Backend: FastAPI
+    - База данных: SQLite
+    - ML-модель: ResNet18
+    '''
+)
 
 
 with st.sidebar:
@@ -57,14 +59,17 @@ if not backend_available():
     st.error("Backend не запущен. Запустите: uvicorn backend.api:app --reload")
     st.stop()
 
+
 st.success("Backend FastAPI доступен")
 
 
-tab_search, tab_db, tab_about = st.tabs([
-    "🔎 Поиск по фото",
-    "📋 База животных",
-    "ℹ️ О проекте",
-])
+tab_search, tab_db, tab_about = st.tabs(
+    [
+        "🔎 Поиск по фото",
+        "📋 База животных",
+        "ℹ️ О проекте",
+    ]
+)
 
 
 with tab_search:
@@ -119,10 +124,18 @@ with tab_search:
                 else:
                     st.success(f"Найдено результатов: {len(results)}")
 
-                    chart_df = pd.DataFrame({
-                        "Животное": [item["name"] for item in results],
-                        "Похожесть": [item["similarity_percent"] for item in results],
-                    }).set_index("Животное")
+                    chart_df = pd.DataFrame(
+                        {
+                            "Животное": [
+                                item["name"]
+                                for item in results
+                            ],
+                            "Похожесть": [
+                                item["similarity_percent"]
+                                for item in results
+                            ],
+                        }
+                    ).set_index("Животное")
 
                     st.subheader("График похожести")
                     st.bar_chart(chart_df)
@@ -134,8 +147,13 @@ with tab_search:
                             col1, col2 = st.columns([1, 3])
 
                             with col1:
-                                if os.path.exists(item["image_path"]):
-                                    st.image(item["image_path"], use_container_width=True)
+                                image_path = item["image_path"]
+
+                                if os.path.exists(image_path):
+                                    st.image(
+                                        image_path,
+                                        use_container_width=True,
+                                    )
                                 else:
                                     st.warning("Фото не найдено")
 
@@ -144,7 +162,10 @@ with tab_search:
                                 st.write(f"**Тип:** {item['animal_type']}")
                                 st.write(f"**Локация:** {item['location']}")
                                 st.write(f"**Описание:** {item['description']}")
-                                st.write(f"**Похожесть:** {item['similarity_percent']}%")
+                                st.write(
+                                    f"**Похожесть:** "
+                                    f"{item['similarity_percent']}%"
+                                )
 
                                 progress_value = max(
                                     0.0,
@@ -160,7 +181,10 @@ with tab_search:
                                 else:
                                     st.info("Низкое сходство")
 
-                                st.markdown(f"[Источник]({item['source_url']})")
+                                if item.get("source_url"):
+                                    st.markdown(
+                                        f"[Источник]({item['source_url']})"
+                                    )
 
                             st.markdown("---")
 
@@ -180,8 +204,10 @@ with tab_db:
                 col1, col2 = st.columns([1, 3])
 
                 with col1:
-                    if os.path.exists(pet["image_path"]):
-                        st.image(pet["image_path"], use_container_width=True)
+                    image_path = pet["image_path"]
+
+                    if os.path.exists(image_path):
+                        st.image(image_path, use_container_width=True)
                     else:
                         st.warning("Фото не найдено")
 
@@ -190,7 +216,9 @@ with tab_db:
                     st.write(f"**Тип:** {pet['animal_type']}")
                     st.write(f"**Локация:** {pet['location']}")
                     st.write(f"**Описание:** {pet['description']}")
-                    st.markdown(f"[Источник]({pet['source_url']})")
+
+                    if pet.get("source_url"):
+                        st.markdown(f"[Источник]({pet['source_url']})")
 
                 st.markdown("---")
     else:
@@ -200,14 +228,16 @@ with tab_db:
 with tab_about:
     st.subheader("Описание проекта")
 
-    st.write("""
-    Этот проект реализует минимальный ML-сервис для поиска животных 
-    в картотеке потерянных животных.
+    st.write(
+        '''
+        Этот проект реализует минимальный ML-сервис для поиска животных
+        в картотеке потерянных животных.
 
-    Пользователь загружает фотографию через Streamlit. 
-    Frontend отправляет изображение в FastAPI backend. 
-    Backend получает список животных из SQLite-базы и сравнивает фотографии 
-    с помощью предобученной модели ResNet18.
+        Пользователь загружает фотографию через Streamlit.
+        Frontend отправляет изображение в FastAPI backend.
+        Backend получает список животных из SQLite-базы и сравнивает фотографии
+        с помощью предобученной модели ResNet18.
 
-    Результаты сортируются по cosine similarity и возвращаются во frontend.
-    """)
+        Результаты сортируются по cosine similarity и возвращаются во frontend.
+        '''
+    )
