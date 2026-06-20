@@ -9,12 +9,14 @@ def get_all_pets():
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        '''
         SELECT id, name, animal_type, location, description, image_path, source_url
         FROM pets
-    """)
+        '''
+    )
 
-    rows = cursor.fetchall()
+    pets = [dict(row) for row in cursor.fetchall()]
     conn.close()
 
-    return [dict(row) for row in rows]
+    return pets

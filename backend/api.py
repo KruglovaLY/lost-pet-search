@@ -10,7 +10,7 @@ from backend.ml import search_similar_pets
 
 app = FastAPI(
     title="Lost Pet Search API",
-    description="API для поиска похожих потерянных животных по фотографии",
+    description="Backend API для поиска похожих животных по фотографии",
     version="1.0.0",
 )
 
@@ -38,11 +38,12 @@ def health():
 
 
 @app.get("/pets")
-def get_pets():
-    pets = get_all_pets()
+def pets():
+    items = get_all_pets()
+
     return {
-        "count": len(pets),
-        "items": pets,
+        "count": len(items),
+        "items": items,
     }
 
 
@@ -55,18 +56,16 @@ async def search(
     image_bytes = await file.read()
     image = Image.open(BytesIO(image_bytes))
 
-    pets = get_all_pets()
+    pets_from_db = get_all_pets()
 
     results = search_similar_pets(
         query_image=image,
-        pets=pets,
+        pets=pets_from_db,
         top_k=top_k,
         animal_type=animal_type,
     )
 
     return {
         "filename": file.filename,
-        "top_k": top_k,
-        "animal_type": animal_type,
         "results": results,
     }
